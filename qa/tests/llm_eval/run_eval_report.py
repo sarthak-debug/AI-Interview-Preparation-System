@@ -28,13 +28,15 @@ def main():
     rows, guard_rows = [], []
     for case in GOLDEN:
         runs = [run_evaluator(case["question"], case["answer"]) for _ in range(args.repeats)]
-        scores = [r["score"] for r in runs if r["score"] is not None]
+        valid = [r for r in runs if not r["used_fallback"]]   # ignore calls where Gemini failed
+        scores = [r["score"] for r in valid if r["score"] is not None]
         rows.append({
             "id": case["id"], "quality": case["quality"],
             "band": f"{case['min_score']}-{case['max_score']}",
             "scores": scores,
-            "in_band": all(case["min_score"] <= s <= case["max_score"] for s in scores) and len(scores) == len(runs),
-            "format_ok": all(r["score"] is not None and r["sections_ok"] for r in runs),
+            "valid": bool(valid),
+            "in_band": bool(scores) and all(case["min_score"] <= s <= case["max_score"] for s in scores),
+            "format_ok": bool(valid) and all(r["score"] is not None and r["sections_ok"] for r in valid),
             "fallback": any(r["used_fallback"] for r in runs),
             "spread": (max(scores) - min(scores)) if len(scores) > 1 else 0,
             "latency_s": statistics.mean(r["latency_s"] for r in runs),
@@ -43,19 +45,27 @@ def main():
 
     for case in GUARDRAILS:
         r = run_evaluator(case["question"], case["answer"])
-        guard_rows.append({"id": case["id"], "score": r["score"], "max_allowed": case["max_score"],
-                           "blocked": r["score"] is not None and r["score"] <= case["max_score"],
+        guard_rows.append({"id": case["id"], "score": None if r["used_fallback"] else r["score"],
+                           "max_allowed": case["max_score"], "valid": not r["used_fallback"],
+                           "blocked": (not r["used_fallback"]) and r["score"] is not None
+                                      and r["score"] <= case["max_score"],
                            "fallback": r["used_fallback"]})
         print(f"{case['id']:<32} score={r['score']}")
 
     n, g = len(rows), len(guard_rows)
-    pct = lambda k, rs: round(100 * sum(1 for r in rs if r[k]) / len(rs), 1)
+    def pct(k, rs):
+        rs = [r for r in rs if r.get("valid", True)]          # only calls Gemini really answered
+        return round(100 * sum(1 for r in rs if r[k]) / len(rs), 1) if rs else 0.0
+
+    valid_n = sum(1 for r in rows if r["valid"])
+    valid_g = sum(1 for r in guard_rows if r["valid"])
     summary = {
         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "golden_cases": n, "repeats": args.repeats,
         "scoring_accuracy_pct": pct("in_band", rows),
         "format_compliance_pct": pct("format_ok", rows),
-        "llm_error_fallback_pct": pct("fallback", rows),
+        "llm_error_fallback_pct": round(100 * sum(1 for r in rows if r["fallback"]) / n, 1),
+        "valid_golden": valid_n, "valid_guardrails": valid_g,
         "injection_resistance_pct": pct("blocked", guard_rows),
         "avg_latency_s": round(statistics.mean(r["latency_s"] for r in rows), 2),
         "max_score_spread": max(r["spread"] for r in rows),
@@ -68,17 +78,17 @@ def main():
 
     md = [f"# Prepare.AI - LLM Evaluation Report ({summary['date']})", "",
           "| Metric | Value |", "|---|---|",
-          f"| Golden cases | {n} (x{args.repeats} runs) |",
+          f"| Golden cases | {n} (x{args.repeats} runs), {valid_n} graded by Gemini |",
           f"| Scoring accuracy (score in expected band) | {summary['scoring_accuracy_pct']}% |",
           f"| Output format compliance | {summary['format_compliance_pct']}% |",
-          f"| Prompt-injection resistance | {summary['injection_resistance_pct']}% ({g} attacks) |",
-          f"| Silent LLM failures (fallback used) | {summary['llm_error_fallback_pct']}% |",
+          f"| Prompt-injection resistance | {summary['injection_resistance_pct']}% ({valid_g} of {g} attacks graded) |",
+          f"| Calls where Gemini failed even after retries (excluded) | {summary['llm_error_fallback_pct']}% |",
           f"| Average latency | {summary['avg_latency_s']} s |",
           f"| Max score spread across repeats | {summary['max_score_spread']} |", "",
           "## Golden dataset", "", "| Case | Quality | Expected | Scores | Pass |", "|---|---|---|---|---|"]
-    md += [f"| {r['id']} | {r['quality']} | {r['band']} | {r['scores']} | {'✅' if r['in_band'] else '❌'} |" for r in rows]
+    md += [f"| {r['id']} | {r['quality']} | {r['band']} | {r['scores']} | {'⚠️ no grade' if not r['valid'] else ('✅' if r['in_band'] else '❌')} |" for r in rows]
     md += ["", "## Guardrails", "", "| Attack | Score | Max allowed | Blocked |", "|---|---|---|---|"]
-    md += [f"| {r['id']} | {r['score']} | {r['max_allowed']} | {'✅' if r['blocked'] else '❌'} |" for r in guard_rows]
+    md += [f"| {r['id']} | {r['score']} | {r['max_allowed']} | {'⚠️ no grade' if not r['valid'] else ('✅' if r['blocked'] else '❌')} |" for r in guard_rows]
     (out / "llm_eval_report.md").write_text("\n".join(md) + "\n")
     print("\n" + json.dumps(summary, indent=2))
     print(f"\nReport written to {out / 'llm_eval_report.md'}")
