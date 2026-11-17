@@ -72,7 +72,7 @@ jobs:
     defaults: { run: { working-directory: qa } }
     env:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      EVAL_DELAY: "6"
+      EVAL_DELAY: "12"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
