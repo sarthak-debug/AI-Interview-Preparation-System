@@ -1,0 +1,228 @@
+{
+  "info": {
+    "name": "Prepare.AI API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API test suite for the Prepare.AI FastAPI backend. Run in Postman or with: newman run PrepareAI.postman_collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "OpenAPI spec is published",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/openapi.json",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "openapi.json"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const spec = pm.response.json();",
+              "pm.test('has /upload and /evaluate', () => {",
+              "  pm.expect(spec.paths).to.have.property('/upload');",
+              "  pm.expect(spec.paths).to.have.property('/evaluate');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload resume - happy path",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/upload",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "upload"
+          ]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "sample_resume.pdf"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const b = pm.response.json();",
+              "pm.test('response has all fields', () => pm.expect(b).to.have.all.keys('filename','skills','stored_questions','ai_questions','is_ai_fallback'));",
+              "pm.test('python skill detected', () => pm.expect(b.skills).to.include('python'));",
+              "pm.test('stored questions returned', () => pm.expect(b.stored_questions.length).to.be.above(0));",
+              "pm.test('is_ai_fallback is boolean', () => pm.expect(b.is_ai_fallback).to.be.a('boolean'));",
+              "pm.test('responds in under 30s', () => pm.expect(pm.response.responseTime).to.be.below(30000));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Upload without file - 422",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/upload",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "upload"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate answer - happy path",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/evaluate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "evaluate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What is a JOIN?\",\n  \"answer\": \"A JOIN combines rows from two tables based on a related column, such as INNER JOIN or LEFT JOIN.\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 200', () => pm.response.to.have.status(200));",
+              "const fb = pm.response.json().feedback;",
+              "pm.test('feedback has Score: x/10', () => pm.expect(fb).to.match(/Score:\\s*\\**\\s*\\d+(\\.\\d+)?\\s*\\/\\s*10/i));",
+              "pm.test('feedback has sections', () => { pm.expect(fb.toLowerCase()).to.include('strengths'); pm.expect(fb.toLowerCase()).to.include('improvements'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate - missing answer - 422",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/evaluate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "evaluate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": \"What is a JOIN?\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate - wrong types - 422",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/evaluate",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "evaluate"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"question\": 123,\n  \"answer\": [\n    \"x\"\n  ]\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('status 422', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
