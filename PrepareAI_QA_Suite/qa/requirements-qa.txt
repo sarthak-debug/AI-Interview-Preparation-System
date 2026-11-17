@@ -1,0 +1,16 @@
+# Backend dependencies (needed to import the app under test)
+fastapi
+uvicorn
+python-multipart
+pypdf
+python-dotenv
+google-generativeai
+
+# Test tooling
+pytest
+httpx
+reportlab            # builds sample resume PDFs for upload tests
+deepeval             # LLM evaluation framework (G-Eval metric)
+google-genai         # lets DeepEval use Gemini as the judge model
+playwright
+pytest-playwright

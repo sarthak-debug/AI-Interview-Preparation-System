@@ -1,0 +1,194 @@
+[
+  {
+    "id": "py-decorator-strong",
+    "question": "What is a decorator in Python?",
+    "answer": "A decorator is a function that takes another function and returns a new function that adds behaviour before or after it, without changing the original code. It is applied with the @ syntax, for example @login_required in Flask or @staticmethod. Common uses are logging, timing, caching and access control.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "py-decorator-partial",
+    "question": "What is a decorator in Python?",
+    "answer": "It is something with the @ symbol that you put above a function.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "py-decorator-wrong",
+    "question": "What is a decorator in Python?",
+    "answer": "A decorator is a Python data type used to store key value pairs, like a dictionary.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "py-list-tuple-strong",
+    "question": "Difference between list and tuple?",
+    "answer": "Lists are mutable, so you can add, remove or change items, and use square brackets. Tuples are immutable and use parentheses. Because tuples cannot change they are hashable, can be dictionary keys, and are slightly faster and lighter in memory. Use a list for a collection that changes and a tuple for fixed records such as coordinates.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "py-list-tuple-wrong",
+    "question": "Difference between list and tuple?",
+    "answer": "There is no difference, list and tuple are two names for the same thing in Python.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "py-lambda-partial",
+    "question": "What is a lambda function?",
+    "answer": "A small function without a name.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "react-vdom-strong",
+    "question": "What is Virtual DOM?",
+    "answer": "The Virtual DOM is a lightweight in-memory copy of the real DOM that React keeps. When state changes, React builds a new virtual tree, diffs it against the previous one (reconciliation) and applies only the minimal changes to the real DOM, which is slow to update directly. This batching makes UI updates efficient.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "react-vdom-wrong",
+    "question": "What is Virtual DOM?",
+    "answer": "Virtual DOM is a browser plugin that makes websites run inside a virtual machine for security.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "react-state-props-strong",
+    "question": "Difference between State and Props?",
+    "answer": "Props are inputs passed from a parent component and are read-only inside the child. State is data owned and managed inside a component, changed with setState or the useState hook, and changing it re-renders the component. Data flows down through props, while state holds what changes over time.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "react-hooks-partial",
+    "question": "What are React Hooks?",
+    "answer": "Hooks like useState let you use state.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "sql-delete-truncate-strong",
+    "question": "Difference between DELETE and TRUNCATE?",
+    "answer": "DELETE is a DML command that removes rows one by one, can use a WHERE clause, fires triggers and can be rolled back. TRUNCATE is a DDL command that removes all rows at once by deallocating data pages, cannot use WHERE, is much faster, usually resets identity counters and does not fire row triggers.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "sql-delete-truncate-wrong",
+    "question": "Difference between DELETE and TRUNCATE?",
+    "answer": "TRUNCATE deletes the whole database and DELETE deletes a table.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "sql-join-strong",
+    "question": "What is a JOIN?",
+    "answer": "A JOIN combines rows from two or more tables based on a related column, usually a foreign key. INNER JOIN returns only matching rows, LEFT JOIN returns all rows from the left table plus matches, RIGHT JOIN the opposite, and FULL OUTER JOIN returns all rows from both. For example joining orders and customers on customer_id.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "sql-join-partial",
+    "question": "What is a JOIN?",
+    "answer": "It joins two tables together.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "sql-normalization-wrong",
+    "question": "What is normalization?",
+    "answer": "Normalization means converting all the text in the database to lowercase.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "git-merge-rebase-strong",
+    "question": "Difference between merge and rebase?",
+    "answer": "Merge combines two branches by creating a merge commit and keeps the full history as it happened. Rebase moves your commits on top of another branch, rewriting them to create a linear history. Rebase gives a cleaner log but should not be used on shared public branches because it rewrites commit hashes.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "git-pr-partial",
+    "question": "What is a pull request?",
+    "answer": "A request to merge code on GitHub.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "js-closure-strong",
+    "question": "What is closure?",
+    "answer": "A closure is a function that remembers the variables from the scope where it was created, even after that outer function has returned. For example a counter function returned from makeCounter keeps access to its private count variable. Closures are used for data privacy, callbacks and function factories.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "js-closure-wrong",
+    "question": "What is closure?",
+    "answer": "Closure is when you close the browser tab and JavaScript stops running.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "js-let-var-const-strong",
+    "question": "Difference between let, var and const?",
+    "answer": "var is function-scoped, hoisted and initialised as undefined, and can be redeclared. let and const are block-scoped and sit in the temporal dead zone until declared. let can be reassigned, const cannot be reassigned, although objects declared with const can still be mutated.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "js-event-bubbling-partial",
+    "question": "What is event bubbling?",
+    "answer": "Events go up to parent elements.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  },
+  {
+    "id": "rest-api-strong",
+    "question": "Explain the concepts of RESTful API design.",
+    "answer": "REST APIs expose resources through URLs and use HTTP methods for actions: GET to read, POST to create, PUT or PATCH to update and DELETE to remove. They are stateless, so each request carries all needed information, return proper status codes like 200, 201, 404 and 500, and usually send JSON. Good design uses nouns in URLs, versioning and pagination.",
+    "quality": "strong",
+    "min_score": 7,
+    "max_score": 10
+  },
+  {
+    "id": "rest-api-wrong",
+    "question": "Explain the concepts of RESTful API design.",
+    "answer": "REST API means the server rests when there are no users, to save electricity.",
+    "quality": "wrong",
+    "min_score": 0,
+    "max_score": 4
+  },
+  {
+    "id": "sql-nosql-partial",
+    "question": "What are the key differences between SQL and NoSQL databases?",
+    "answer": "SQL uses tables and NoSQL does not.",
+    "quality": "partial",
+    "min_score": 4,
+    "max_score": 7
+  }
+]
